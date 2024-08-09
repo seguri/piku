@@ -39,5 +39,23 @@ def postgres_create(name):
             conn.close()
 
 
+@postgres.command("postgres:drop")
+@click.argument("name")
+def postgres_drop(name):
+    """Drops a database"""
+    conn = None
+    try:
+        conn = psycopg2.connect(dbname="postgres", user=DEFAULT_USER)
+        conn.autocommit = True
+        with conn.cursor() as cur:
+            cur.execute(DROP_DB.format(Identifier(name)))
+            click.echo(f"Database '{name}' dropped successfully.")
+    except psycopg2.Error as e:
+        print(f"An error occurred: {e}")
+    finally:
+        if conn:
+            conn.close()
+
+
 def cli_commands():
     return postgres
